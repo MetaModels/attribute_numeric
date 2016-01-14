@@ -47,6 +47,7 @@ class Numeric extends BaseSimple
         return array_merge(
             parent::getAttributeSettingNames(),
             array(
+                'isunique',
                 'mandatory',
                 'filterable',
                 'searchable',
