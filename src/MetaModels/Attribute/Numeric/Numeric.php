@@ -139,7 +139,7 @@ class Numeric extends BaseSimple
      *
      * @return string[] The list of item ids of all items matching the condition.
      */
-    protected function getIdsFiltered($varValue, $strOperation)
+    private function getIdsFiltered($varValue, $strOperation)
     {
         $strSql = sprintf(
             'SELECT id FROM %s WHERE %s %s %d',
