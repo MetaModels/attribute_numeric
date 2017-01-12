@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_decimal.
+ * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2015 The MetaModels team.
+ * (c) 2012-2017 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
- * @copyright  2012-2016 The MetaModels team.
+ * @copyright  2012-2017 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
  */
@@ -27,12 +27,8 @@ use MetaModels\Attribute\BaseSimple;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
- *
- * @package    MetaModels
- * @subpackage AttributeNumeric
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
-class Numeric extends BaseSimple
+class AttributeNumeric extends BaseSimple
 {
     /**
      * {@inheritdoc}
