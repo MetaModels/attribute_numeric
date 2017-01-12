@@ -93,7 +93,7 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
             $this->mockMetaModel('mm_test', 'de', 'en')
         );
 
-        $this->assertInstanceOf('MetaModels\Attribute\Numeric\AttributeNumeric', $attribute);
+        $this->assertInstanceOf('MetaModels\Attribute\Numeric\Numeric', $attribute);
 
         foreach ($values as $key => $value) {
             $this->assertEquals($value, $attribute->get($key), $key);
