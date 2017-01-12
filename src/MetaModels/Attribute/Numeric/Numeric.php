@@ -28,7 +28,7 @@ use MetaModels\Attribute\BaseSimple;
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
-class AttributeNumeric extends BaseSimple
+class Numeric extends BaseSimple
 {
     /**
      * {@inheritdoc}

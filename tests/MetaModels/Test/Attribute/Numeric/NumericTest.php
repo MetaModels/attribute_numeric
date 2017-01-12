@@ -22,13 +22,13 @@
 namespace MetaModels\Test\Attribute\Numeric;
 
 use Contao\Database;
-use MetaModels\Attribute\Numeric\AttributeNumeric;
+use MetaModels\Attribute\Numeric\Numeric;
 use MetaModels\MetaModelsServiceContainer;
 
 /**
  * Unit tests to test class Numeric.
  */
-class AttributeNumericTest extends \PHPUnit_Framework_TestCase
+class NumericTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Mock the Contao database.
@@ -166,8 +166,8 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstantiation()
     {
-        $text = new AttributeNumeric($this->mockMetaModel('en', 'en', $this->mockDatabase()));
-        $this->assertInstanceOf('MetaModels\Attribute\Numeric\AttributeNumeric', $text);
+        $text = new Numeric($this->mockMetaModel('en', 'en', $this->mockDatabase()));
+        $this->assertInstanceOf('MetaModels\Attribute\Numeric\Numeric', $text);
     }
 
 
@@ -195,7 +195,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testSearchFor($value)
     {
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel(
                 'en',
                 'en',
@@ -217,7 +217,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testSearchForWithWildcard()
     {
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel(
                 'en',
                 'en',
@@ -239,7 +239,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testSearchForWithNonNumeric()
     {
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel(
                 'en',
                 'en',
