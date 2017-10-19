@@ -1,0 +1,5 @@
+services:
+    metamodels.attribute_numeric.factory:
+        class: MetaModels\Attribute\Numeric\AttributeTypeFactory
+        tags:
+          - { name: metamodels.attribute_factory }
