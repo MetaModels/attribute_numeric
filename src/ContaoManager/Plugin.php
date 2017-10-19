@@ -43,7 +43,7 @@ class Plugin implements BundlePluginInterface
                         MetaModelsCoreBundle::class
                     ]
                 )
-                ->setReplace(['metamodels'])
+                ->setReplace(['metamodelsattribute_numeric'])
         ];
     }
 }
