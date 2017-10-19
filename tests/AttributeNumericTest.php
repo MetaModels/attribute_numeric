@@ -14,6 +14,7 @@
  * @subpackage Tests
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     David Greminger <david.greminger@1up.io>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @copyright  2012-2016 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
@@ -21,96 +22,66 @@
 
 namespace MetaModels\Test\Attribute\Numeric;
 
-use Contao\Database;
+use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Driver\Statement;
 use MetaModels\Attribute\Numeric\AttributeNumeric;
-use MetaModels\MetaModelsServiceContainer;
+use MetaModels\MetaModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class Numeric.
  */
-class AttributeNumericTest extends \PHPUnit_Framework_TestCase
+class AttributeNumericTest extends TestCase
 {
     /**
      * Mock the Contao database.
      *
-     * @param string     $expectedQuery The query to expect.
+     * @param string|null   expectedQuery The query to expect.
      *
-     * @param null|array $result        The resulting datasets.
+     * @param callable|null $callback     Callback which gets mocked statement passed.
      *
-     * @return Database|\PHPUnit_Framework_MockObject_MockObject
+     * @return Connection|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockDatabase($expectedQuery = '', $result = null)
+    private function mockDatabase(callable $callback = null, $expectedQuery = null, $queryMethod = 'prepare')
     {
         $mockDb = $this
-            ->getMockBuilder('Contao\Database')
-            ->disableOriginalConstructor()
-            ->setMethods(array('__destruct'))
-            ->getMockForAbstractClass();
+            ->getMockBuilder(Connection::class)
+            ->getMock();
 
-        $mockDb->method('createStatement')->willReturn(
-            $statement = $this
-                ->getMockBuilder('Contao\Database\Statement')
-                ->disableOriginalConstructor()
-                ->setMethods(array('debugQuery', 'createResult'))
-                ->getMockForAbstractClass()
-        );
+        $statement = $this
+            ->getMockBuilder(Statement::class)
+            ->getMock();
+
+        $mockDb->method('prepare')->willReturn($statement);
+        $mockDb->method('query')->willReturn($statement);
+
+        if ($callback) {
+            call_user_func($callback, $statement);
+        }
+
+        if (!$expectedQuery || $expectedQuery === 'prepare') {
+            $mockDb->expects($this->never())->method('query');
+        }
+
+        if (!$expectedQuery || $expectedQuery === 'query') {
+            $mockDb->expects($this->never())->method('prepare');
+        }
 
         if (!$expectedQuery) {
-            $statement->expects($this->never())->method('prepare_query');
-
             return $mockDb;
         }
 
-        $statement
+        $mockDb
             ->expects($this->once())
-            ->method('prepare_query')
-            ->with($expectedQuery)
-            ->willReturnArgument(0);
+            ->method($queryMethod)
+            ->with($expectedQuery);
 
-        if ($result === null) {
-            $result = array('ignored');
-        } else {
-            $result = (object) $result;
+        if ($queryMethod === 'prepare') {
+            $statement
+                ->expects($this->once())
+                ->method('execute')
+                ->willReturn(true);
         }
-
-        $statement->method('execute_query')->willReturn($result);
-        $statement->method('createResult')->willReturnCallback(
-            function ($resultData) {
-                $index = 0;
-
-                $resultData = (array) $resultData;
-
-                $resultSet = $this
-                    ->getMockBuilder('Contao\Database\Result')
-                    ->disableOriginalConstructor()
-                    ->getMockForAbstractClass();
-
-                $resultSet->method('fetch_row')->willReturnCallback(function () use (&$index, $resultData) {
-                    return array_values($resultData[$index++]);
-                });
-                $resultSet->method('fetch_assoc')->willReturnCallback(function () use (&$index, $resultData) {
-                    if (!isset($resultData[$index])) {
-                        return false;
-                    }
-                    return $resultData[$index++];
-                });
-                $resultSet->method('num_rows')->willReturnCallback(function () use ($index, $resultData) {
-                    return count($resultData);
-                });
-                $resultSet->method('num_fields')->willReturnCallback(function () use ($index, $resultData) {
-                    return count($resultData[$index]);
-                });
-                $resultSet->method('fetch_field')->willReturnCallback(function ($field) use ($index, $resultData) {
-                    $data = array_values($resultData[$index]);
-                    return $data[$field];
-                });
-                $resultSet->method('data_seek')->willReturnCallback(function ($newIndex) use (&$index, $resultData) {
-                    $index = $newIndex;
-                });
-
-                return $resultSet;
-            }
-        );
 
         return $mockDb;
     }
@@ -118,21 +89,17 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
     /**
      * Mock a MetaModel.
      *
-     * @param string   $language         The language.
+     * @param string     $language         The language.
      *
-     * @param string   $fallbackLanguage The fallback language.
-     *
-     * @param Database $database         The database to use.
+     * @param string     $fallbackLanguage The fallback language.
      *
      * @return \MetaModels\IMetaModel
      */
-    protected function mockMetaModel($language, $fallbackLanguage, $database)
+    protected function mockMetaModel($language, $fallbackLanguage)
     {
-        $metaModel = $this->getMock(
-            'MetaModels\MetaModel',
-            array(),
-            array(array())
-        );
+        $metaModel = $this->getMockBuilder(MetaModel::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
 
         $metaModel
             ->expects($this->any())
@@ -149,13 +116,6 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
             ->method('getFallbackLanguage')
             ->will($this->returnValue($fallbackLanguage));
 
-        $serviceContainer = new MetaModelsServiceContainer();
-        $serviceContainer->setDatabase($database);
-
-        $metaModel
-            ->method('getServiceContainer')
-            ->willReturn($serviceContainer);
-
         return $metaModel;
     }
 
@@ -166,10 +126,10 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstantiation()
     {
-        $text = new AttributeNumeric($this->mockMetaModel('en', 'en', $this->mockDatabase()));
-        $this->assertInstanceOf('MetaModels\Attribute\Numeric\AttributeNumeric', $text);
+        $connection = $this->mockDatabase();
+        $text       = new AttributeNumeric($this->mockMetaModel('en', 'en'), $connection);
+        $this->assertInstanceOf(AttributeNumeric::class, $text);
     }
-
 
     /**
      * Test provider for testSearchFor().
@@ -195,15 +155,25 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testSearchFor($value)
     {
+        $connection = $this->mockDatabase(
+            function ($statement) use ($value) {
+                $statement
+                    ->expects($this->once())
+                    ->method('bindValue')
+                    ->with('pattern', $value);
+
+                $statement
+                    ->expects($this->once())
+                    ->method('fetchAll')
+                    ->with(\PDO::FETCH_COLUMN, 'id')
+                    ->willReturn([1, 2]);
+            },
+            'SELECT id FROM mm_unittest WHERE test=:pattern'
+        );
+
         $decimal = new AttributeNumeric(
-            $this->mockMetaModel(
-                'en',
-                'en',
-                $this->mockDatabase(
-                    'SELECT id FROM mm_unittest WHERE test=?',
-                    array(array('id' => 1), array('id' => 2))
-                )
-            ),
+            $this->mockMetaModel('en', 'en'),
+            $connection,
             array('colname' => 'test')
         );
 
@@ -217,15 +187,26 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     public function testSearchForWithWildcard()
     {
+        // TODO: Wait until BaseSimple attribute got rewritten to finish the test.
+        $connection = $this->mockDatabase(
+            function ($statement) {
+                $statement
+                    ->expects($this->once())
+                    ->method('bindValue')
+                    ->with('pattern', '10*');
+
+                $statement
+                    ->expects($this->once())
+                    ->method('fetchAll')
+                    ->with(\PDO::FETCH_COLUMN, 'id')
+                    ->willReturn([1, 2]);
+            },
+            'SELECT id FROM mm_unittest WHERE test LIKE :pattern'
+        );
+
         $decimal = new AttributeNumeric(
-            $this->mockMetaModel(
-                'en',
-                'en',
-                $this->mockDatabase(
-                    'SELECT id FROM mm_unittest WHERE test LIKE ?',
-                    array(array('id' => 1), array('id' => 2))
-                )
-            ),
+            $this->mockMetaModel('en', 'en'),
+            $connection,
             array('colname' => 'test')
         );
 
@@ -240,11 +221,8 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
     public function testSearchForWithNonNumeric()
     {
         $decimal = new AttributeNumeric(
-            $this->mockMetaModel(
-                'en',
-                'en',
-                $this->mockDatabase()
-            ),
+            $this->mockMetaModel('en', 'en'),
+            $this->mockDatabase(),
             array('colname' => 'test')
         );
 

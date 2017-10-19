@@ -14,6 +14,7 @@
  * @subpackage Tests
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     David Greminger <david.greminger@1up.io>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @copyright  2012-2017 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
@@ -21,15 +22,17 @@
 
 namespace MetaModels\Test\Attribute\Numeric;
 
+use Doctrine\DBAL\Driver\Connection;
 use MetaModels\Attribute\IAttributeTypeFactory;
+use MetaModels\Attribute\Numeric\AttributeNumeric;
 use MetaModels\Attribute\Numeric\AttributeTypeFactory;
 use MetaModels\IMetaModel;
-use MetaModels\Test\Attribute\AttributeTypeFactoryTest;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test the attribute factory.
  */
-class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
+class NumericAttributeTypeFactoryTest extends TestCase
 {
     /**
      * Mock a MetaModel.
@@ -44,11 +47,10 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
      */
     protected function mockMetaModel($tableName, $language, $fallbackLanguage)
     {
-        $metaModel = $this->getMock(
-            'MetaModels\MetaModel',
-            array(),
-            array(array())
-        );
+        $metaModel = $this
+            ->getMockBuilder('MetaModels\MetaModel')
+            ->setConstructorArgs([[]])
+            ->getMock();
 
         $metaModel
             ->expects($this->any())
@@ -75,7 +77,9 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
      */
     protected function getAttributeFactories()
     {
-        return array(new AttributeTypeFactory());
+        $connection = $this->getMockBuilder(Connection::class)->getMock();
+
+        return array(new AttributeTypeFactory($connection));
     }
 
     /**
@@ -83,17 +87,18 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
      *
      * @return void
      */
-    public function testCreateSelect()
+    public function testCreateNumeric()
     {
-        $factory   = new AttributeTypeFactory();
-        $values    = array(
+        $connection = $this->getMockBuilder(Connection::class)->getMock();
+        $factory    = new AttributeTypeFactory($connection);
+        $values     = array(
         );
         $attribute = $factory->createInstance(
             $values,
             $this->mockMetaModel('mm_test', 'de', 'en')
         );
 
-        $this->assertInstanceOf('MetaModels\Attribute\Numeric\AttributeNumeric', $attribute);
+        $this->assertInstanceOf(AttributeNumeric::class, $attribute);
 
         foreach ($values as $key => $value) {
             $this->assertEquals($value, $attribute->get($key), $key);
