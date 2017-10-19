@@ -7,7 +7,7 @@
     "attribute",
     "numeric"
   ],
-  "type": "contao-module",
+  "type": "contao-bundle",
   "homepage": "http://now.metamodel.me/",
   "license": "LGPL-3.0+",
   "authors": [
@@ -31,24 +31,26 @@
     "source": "https://github.com/MetaModels/attribute_numeric"
   },
   "require": {
-    "php": ">=5.4",
-    "contao/core": "^3.5.5",
-    "contao-community-alliance/composer-plugin": "~2.0",
-    "contao-community-alliance/dc-general": "~2.0@beta",
-    "metamodels/core": "~2.0@alpha"
+    "php": ">=5.6",
+    "contao/core-bundle": "^4.4",
+    "contao-community-alliance/dc-general": "~2.1@dev",
+    "metamodels/core": "~2.1@dev",
+    "symfony/dependency-injection": "^3.3",
+    "symfony/http-kernel": "^3.3"
   },
   "require-dev": {
     "cyberspectrum/contao-toolbox": "~0.6",
     "phpcq/all-tasks": "~1.1",
+    "contao/manager-bundle": "~4.4",
     "metamodels/base-unit-tests": "~1.0"
   },
   "autoload": {
-    "psr-0": {
+    "psr-4": {
       "MetaModels\\Attribute\\Numeric\\": "src"
     }
   },
   "autoload-dev": {
-    "psr-0": {
+    "psr-4": {
       "MetaModels\\Test\\Attribute\\Numeric\\": "tests"
     }
   },
@@ -60,13 +62,13 @@
       "transifex": {
         "project": "metamodels",
         "prefix": "attribute_numeric-",
-        "languages_cto": "contao/languages",
+        "languages_cto": "src/Resources/contao/languages",
         "languages_tx": ".tx"
       }
     },
     "branch-alias": {
       "dev-master": "2.0.x-dev",
-      "dev-develop": "2.1.x-dev"
+      "dev-feature/contao4": "2.1.x-dev"
     }
   }
 }
