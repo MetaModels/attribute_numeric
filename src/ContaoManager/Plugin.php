@@ -26,7 +26,10 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use MetaModels\Attribute\Numeric\MetaModelsAttributeNumericBundle;
 use MetaModels\CoreBundle\MetaModelsCoreBundle;
 
-class Plugin  implements BundlePluginInterface
+/**
+ * Contao Manager plugin.
+ */
+class Plugin implements BundlePluginInterface
 {
     /**
      * {@inheritdoc}
