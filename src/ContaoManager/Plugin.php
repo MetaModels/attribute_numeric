@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_text.
+ * * This file is part of MetaModels/attribute_numeric.
  *
  * (c) 2012-2017 The MetaModels team.
  *
