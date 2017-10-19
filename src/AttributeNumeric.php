@@ -144,12 +144,12 @@ class AttributeNumeric extends BaseSimple
 
         // Do a simple search on given column.
         $statement = $this->connection->prepare(
-                sprintf(
-                    'SELECT id FROM %s WHERE %s=:pattern',
-                    $this->getMetaModel()->getTableName(),
-                    $this->getColName()
-                )
-            );
+            sprintf(
+                'SELECT id FROM %s WHERE %s=:pattern',
+                $this->getMetaModel()->getTableName(),
+                $this->getColName()
+            )
+        );
 
         $statement->bindValue('pattern', $strPattern);
         $statement->execute();

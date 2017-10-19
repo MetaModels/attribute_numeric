@@ -33,6 +33,8 @@ use MetaModels\Attribute\AbstractAttributeTypeFactory;
 class AttributeTypeFactory extends AbstractAttributeTypeFactory
 {
     /**
+     * Database connection.
+     *
      * @var Connection
      */
     private $connection;
@@ -41,7 +43,6 @@ class AttributeTypeFactory extends AbstractAttributeTypeFactory
      * Create a new instance.
      *
      * @param Connection $connection Database connection;
-     *
      */
     public function __construct(Connection $connection)
     {
