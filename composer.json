@@ -41,8 +41,7 @@
   "require-dev": {
     "cyberspectrum/contao-toolbox": "~0.6",
     "phpcq/all-tasks": "~1.1",
-    "contao/manager-bundle": "~4.4",
-    "metamodels/base-unit-tests": "~1.0"
+    "contao/manager-bundle": "~4.4"
   },
   "autoload": {
     "psr-4": {
@@ -70,5 +69,13 @@
       "dev-master": "2.0.x-dev",
       "dev-feature/contao4": "2.1.x-dev"
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@gitlab.com:metamodels/core.git"
+    }
+  ]
 }
