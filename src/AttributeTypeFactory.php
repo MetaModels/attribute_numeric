@@ -38,7 +38,7 @@ class AttributeTypeFactory extends AbstractAttributeTypeFactory
         parent::__construct();
 
         $this->typeName  = 'numeric';
-        $this->typeIcon  = 'system/modules/metamodelsattribute_numeric/html/numeric.png';
+        $this->typeIcon  = 'bundles/metamodelsattributenumericbundle/numeric.png';
         $this->typeClass = 'MetaModels\Attribute\Numeric\AttributeNumeric';
     }
 }
