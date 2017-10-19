@@ -24,13 +24,42 @@
 
 namespace MetaModels\Attribute\Numeric;
 
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\BaseSimple;
+use MetaModels\IMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
 class AttributeNumeric extends BaseSimple
 {
+    /**
+     * Database connection.
+     *
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * Instantiate an MetaModel attribute.
+     *
+     * Note that you should not use this directly but use the factory classes to instantiate attributes.
+     *
+     * @param IMetaModel $objMetaModel The MetaModel instance this attribute belongs to.
+     *
+     * @param Connection $connection   The database connection.
+     *
+     * @param array      $arrData      The information array, for attribute information, refer to documentation of
+     *                                 table tl_metamodel_attribute and documentation of the certain attribute classes
+     *                                 for information what values are understood.
+     */
+    public function __construct(IMetaModel $objMetaModel, Connection $connection, array $arrData = [])
+    {
+        parent::__construct($objMetaModel, $arrData);
+
+        $this->connection = $connection;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -114,17 +143,18 @@ class AttributeNumeric extends BaseSimple
         }
 
         // Do a simple search on given column.
-        $query = $this->getMetaModel()->getServiceContainer()->getDatabase()
-            ->prepare(
+        $statement = $this->connection->prepare(
                 sprintf(
-                    'SELECT id FROM %s WHERE %s=?',
+                    'SELECT id FROM %s WHERE %s=:pattern',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
                 )
-            )
-            ->execute($strPattern);
+            );
 
-        return $query->fetchEach('id');
+        $statement->bindValue('pattern', $strPattern);
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
     }
 
     /**
@@ -146,8 +176,8 @@ class AttributeNumeric extends BaseSimple
             intval($varValue)
         );
 
-        $objIds = $this->getMetaModel()->getServiceContainer()->getDatabase()->execute($strSql);
+        $statement = $this->connection->query($strSql);
 
-        return $objIds->fetchEach('id');
+        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
     }
 }

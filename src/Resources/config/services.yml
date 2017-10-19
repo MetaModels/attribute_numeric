@@ -1,5 +1,7 @@
 services:
     metamodels.attribute_numeric.factory:
         class: MetaModels\Attribute\Numeric\AttributeTypeFactory
+        arguments:
+            - '@database_connection'
         tags:
           - { name: metamodels.attribute_factory }
