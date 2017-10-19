@@ -24,7 +24,7 @@
 
 namespace MetaModels\Attribute\Numeric;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
 use MetaModels\Attribute\AbstractAttributeTypeFactory;
 
 /**
