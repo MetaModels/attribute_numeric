@@ -45,7 +45,12 @@ class PluginTest extends TestCase
         $this->assertInstanceOf(BundlePluginInterface::class, $plugin);
     }
 
-    public function testDependsOnMetaModelsBundle()
+    /**
+     * Tests that the a valid bundle config is created.
+     *
+     * @return void
+     */
+    public function testBundleConfig()
     {
         $parser  = $this->getMockBuilder(ParserInterface::class)->getMock();
         $plugin  = new Plugin();
