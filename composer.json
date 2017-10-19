@@ -56,9 +56,6 @@
   "extra": {
     "contao-manager-plugin": "MetaModels\\Attribute\\Numeric\\ContaoManager\\Plugin",
     "contao": {
-      "sources": {
-        "contao": "system/modules/metamodelsattribute_numeric"
-      },
       "transifex": {
         "project": "metamodels",
         "prefix": "attribute_numeric-",
