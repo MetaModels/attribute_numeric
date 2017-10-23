@@ -24,42 +24,13 @@
 
 namespace MetaModels\Attribute\Numeric;
 
-use Doctrine\DBAL\Driver\Connection;
 use MetaModels\Attribute\BaseSimple;
-use MetaModels\IMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
 class AttributeNumeric extends BaseSimple
 {
-    /**
-     * Database connection.
-     *
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * Instantiate an MetaModel attribute.
-     *
-     * Note that you should not use this directly but use the factory classes to instantiate attributes.
-     *
-     * @param IMetaModel $objMetaModel The MetaModel instance this attribute belongs to.
-     *
-     * @param Connection $connection   The database connection.
-     *
-     * @param array      $arrData      The information array, for attribute information, refer to documentation of
-     *                                 table tl_metamodel_attribute and documentation of the certain attribute classes
-     *                                 for information what values are understood.
-     */
-    public function __construct(IMetaModel $objMetaModel, Connection $connection, array $arrData = [])
-    {
-        parent::__construct($objMetaModel, $arrData);
-
-        $this->connection = $connection;
-    }
-
     /**
      * {@inheritdoc}
      */

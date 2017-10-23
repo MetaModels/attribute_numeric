@@ -22,10 +22,11 @@
 
 namespace MetaModels\Test\Attribute\Numeric;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\IAttributeTypeFactory;
 use MetaModels\Attribute\Numeric\AttributeNumeric;
 use MetaModels\Attribute\Numeric\AttributeTypeFactory;
+use MetaModels\Helper\TableManipulator;
 use MetaModels\IMetaModel;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,20 @@ use PHPUnit\Framework\TestCase;
  */
 class NumericAttributeTypeFactoryTest extends TestCase
 {
+    /**
+     * System columns.
+     *
+     * @var array
+     */
+    private $systemColumns = [
+        'id',
+        'pid',
+        'sorting',
+        'tstamp',
+        'vargroup',
+        'varbase ',
+    ];
+
     /**
      * Mock a MetaModel.
      *
@@ -71,15 +86,42 @@ class NumericAttributeTypeFactoryTest extends TestCase
     }
 
     /**
+     * Mock the database connection.
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private function mockConnection()
+    {
+        return $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * Mock the table manipulator.
+     *
+     * @param Connection $connection The database connection mock.
+     *
+     * @return TableManipulator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function mockTableManipulator(Connection $connection)
+    {
+        return $this->getMockBuilder(TableManipulator::class)
+            ->setConstructorArgs([$connection, $this->systemColumns])
+            ->getMock();
+    }
+
+    /**
      * Override the method to run the tests on the attribute factories to be tested.
      *
      * @return IAttributeTypeFactory[]
      */
     protected function getAttributeFactories()
     {
-        $connection = $this->getMockBuilder(Connection::class)->getMock();
+        $connection  = $this->mockConnection();
+        $manipulator = $this->mockTableManipulator($connection);
 
-        return array(new AttributeTypeFactory($connection));
+        return array(new AttributeTypeFactory($connection, $manipulator));
     }
 
     /**
@@ -89,11 +131,11 @@ class NumericAttributeTypeFactoryTest extends TestCase
      */
     public function testCreateNumeric()
     {
-        $connection = $this->getMockBuilder(Connection::class)->getMock();
-        $factory    = new AttributeTypeFactory($connection);
-        $values     = array(
-        );
-        $attribute = $factory->createInstance(
+        $connection  = $this->mockConnection();
+        $manipulator = $this->mockTableManipulator($connection);
+        $factory     = new AttributeTypeFactory($connection, $manipulator);
+        $values      = [];
+        $attribute   = $factory->createInstance(
             $values,
             $this->mockMetaModel('mm_test', 'de', 'en')
         );

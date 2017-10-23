@@ -24,8 +24,9 @@
 
 namespace MetaModels\Attribute\Numeric;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\AbstractAttributeTypeFactory;
+use MetaModels\Helper\TableManipulator;
 
 /**
  * Attribute type factory for numeric attributes.
@@ -40,18 +41,27 @@ class AttributeTypeFactory extends AbstractAttributeTypeFactory
     private $connection;
 
     /**
+     * Table manipulator.
+     *
+     * @var TableManipulator
+     */
+    private $tableManipulator;
+
+    /**
      * Create a new instance.
      *
-     * @param Connection $connection Database connection;
+     * @param Connection       $connection       Database connection;
+     * @param TableManipulator $tableManipulator Table manipulator.
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, TableManipulator $tableManipulator)
     {
         parent::__construct();
 
-        $this->typeName   = 'numeric';
-        $this->typeIcon   = 'bundles/metamodelsattributenumericbundle/numeric.png';
-        $this->typeClass  = 'MetaModels\Attribute\Numeric\AttributeNumeric';
-        $this->connection = $connection;
+        $this->typeName         = 'numeric';
+        $this->typeIcon         = 'bundles/metamodelsattributenumericbundle/numeric.png';
+        $this->typeClass        = 'MetaModels\Attribute\Numeric\AttributeNumeric';
+        $this->connection       = $connection;
+        $this->tableManipulator = $tableManipulator;
     }
 
     /**
@@ -59,6 +69,6 @@ class AttributeTypeFactory extends AbstractAttributeTypeFactory
      */
     public function createInstance($information, $metaModel)
     {
-        return new $this->typeClass($metaModel, $this->connection, $information);
+        return new $this->typeClass($metaModel, $information, $this->connection, $this->tableManipulator);
     }
 }

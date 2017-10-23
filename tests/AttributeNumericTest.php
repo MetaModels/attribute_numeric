@@ -22,9 +22,11 @@
 
 namespace MetaModels\Test\Attribute\Numeric;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Query\QueryBuilder;
 use MetaModels\Attribute\Numeric\AttributeNumeric;
+use MetaModels\Helper\TableManipulator;
 use MetaModels\MetaModel;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +35,20 @@ use PHPUnit\Framework\TestCase;
  */
 class AttributeNumericTest extends TestCase
 {
+    /**
+     * System columns.
+     *
+     * @var array
+     */
+    private $systemColumns = [
+        'id',
+        'pid',
+        'sorting',
+        'tstamp',
+        'vargroup',
+        'varbase ',
+    ];
+
     /**
      * Mock the Contao database.
      *
@@ -46,6 +62,7 @@ class AttributeNumericTest extends TestCase
     {
         $mockDb = $this
             ->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $statement = $this
@@ -120,14 +137,29 @@ class AttributeNumericTest extends TestCase
     }
 
     /**
+     * Mock the table manipulator.
+     *
+     * @param Connection $connection The database connection mock.
+     *
+     * @return TableManipulator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function mockTableManipulator(Connection $connection)
+    {
+        return $this->getMockBuilder(TableManipulator::class)
+            ->setConstructorArgs([$connection, $this->systemColumns])
+            ->getMock();
+    }
+
+    /**
      * Test that the attribute can be instantiated.
      *
      * @return void
      */
     public function testInstantiation()
     {
-        $connection = $this->mockDatabase();
-        $text       = new AttributeNumeric($this->mockMetaModel('en', 'en'), $connection);
+        $connection       = $this->mockDatabase();
+        $tableManipulator = $this->mockTableManipulator($connection);
+        $text             = new AttributeNumeric($this->mockMetaModel('en', 'en'), [], $connection, $tableManipulator);
         $this->assertInstanceOf(AttributeNumeric::class, $text);
     }
 
@@ -171,13 +203,16 @@ class AttributeNumericTest extends TestCase
             'SELECT id FROM mm_unittest WHERE test=:pattern'
         );
 
+        $manipulator = $this->mockTableManipulator($connection);
+
         $decimal = new AttributeNumeric(
             $this->mockMetaModel('en', 'en'),
+            ['colname' => 'test'],
             $connection,
-            array('colname' => 'test')
+            $manipulator
         );
 
-        $this->assertEquals(array(1, 2), $decimal->searchFor($value));
+        $this->assertEquals([1, 2], $decimal->searchFor($value));
     }
 
     /**
@@ -188,26 +223,34 @@ class AttributeNumericTest extends TestCase
     public function testSearchForWithWildcard()
     {
         // TODO: Wait until BaseSimple attribute got rewritten to finish the test.
-        $connection = $this->mockDatabase(
-            function ($statement) {
-                $statement
-                    ->expects($this->once())
-                    ->method('bindValue')
-                    ->with('pattern', '10*');
+        $connection = $this->mockDatabase();
 
-                $statement
-                    ->expects($this->once())
-                    ->method('fetchAll')
-                    ->with(\PDO::FETCH_COLUMN, 'id')
-                    ->willReturn([1, 2]);
-            },
-            'SELECT id FROM mm_unittest WHERE test LIKE :pattern'
-        );
+        $statement = $this->getMockBuilder(Statement::class)->getMock();
+        $statement
+            ->expects($this->once())
+            ->method('fetchAll')
+            ->with(\PDO::FETCH_COLUMN, 'id')
+            ->willReturn([1, 2]);
+
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        foreach (['select', 'from', 'where', 'groupBy', 'orderBy', 'setParameter'] as $method) {
+            $queryBuilder->method($method)->willReturn($queryBuilder);
+        }
+
+        $queryBuilder->method('execute')->willReturn($statement);
+
+        $connection
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $decimal = new AttributeNumeric(
             $this->mockMetaModel('en', 'en'),
+            array('colname' => 'test'),
             $connection,
-            array('colname' => 'test')
+            $this->mockTableManipulator($connection)
         );
 
         $this->assertEquals(array(1, 2), $decimal->searchFor('10*'));
@@ -220,10 +263,12 @@ class AttributeNumericTest extends TestCase
      */
     public function testSearchForWithNonNumeric()
     {
+        $connection = $this->mockDatabase();
         $decimal = new AttributeNumeric(
             $this->mockMetaModel('en', 'en'),
-            $this->mockDatabase(),
-            array('colname' => 'test')
+            array('colname' => 'test'),
+            $connection,
+            $this->mockTableManipulator($connection)
         );
 
         $this->assertEquals(array(), $decimal->searchFor('abc'));
