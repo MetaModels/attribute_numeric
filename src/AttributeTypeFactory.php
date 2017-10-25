@@ -34,20 +34,6 @@ use MetaModels\Helper\TableManipulator;
 class AttributeTypeFactory extends AbstractAttributeTypeFactory
 {
     /**
-     * Database connection.
-     *
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * Table manipulator.
-     *
-     * @var TableManipulator
-     */
-    private $tableManipulator;
-
-    /**
      * Create a new instance.
      *
      * @param Connection       $connection       Database connection;
@@ -55,20 +41,10 @@ class AttributeTypeFactory extends AbstractAttributeTypeFactory
      */
     public function __construct(Connection $connection, TableManipulator $tableManipulator)
     {
-        parent::__construct();
+        parent::__construct($connection, $tableManipulator);
 
-        $this->typeName         = 'numeric';
-        $this->typeIcon         = 'bundles/metamodelsattributenumericbundle/numeric.png';
-        $this->typeClass        = 'MetaModels\Attribute\Numeric\AttributeNumeric';
-        $this->connection       = $connection;
-        $this->tableManipulator = $tableManipulator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createInstance($information, $metaModel)
-    {
-        return new $this->typeClass($metaModel, $information, $this->connection, $this->tableManipulator);
+        $this->typeName  = 'numeric';
+        $this->typeIcon  = 'bundles/metamodelsattributenumericbundle/numeric.png';
+        $this->typeClass = AttributeNumeric::class;
     }
 }
