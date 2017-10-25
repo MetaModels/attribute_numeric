@@ -25,13 +25,13 @@
 namespace MetaModels\Attribute\Numeric;
 
 use Doctrine\DBAL\Connection;
-use MetaModels\Attribute\AbstractAttributeTypeFactory;
+use MetaModels\Attribute\AbstractSimpleAttributeTypeFactory;
 use MetaModels\Helper\TableManipulator;
 
 /**
  * Attribute type factory for numeric attributes.
  */
-class AttributeTypeFactory extends AbstractAttributeTypeFactory
+class AttributeTypeFactory extends AbstractSimpleAttributeTypeFactory
 {
     /**
      * Create a new instance.
