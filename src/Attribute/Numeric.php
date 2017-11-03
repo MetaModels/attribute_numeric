@@ -22,14 +22,14 @@
  * @filesource
  */
 
-namespace MetaModels\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Attribute;
 
 use MetaModels\Attribute\BaseSimple;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
-class AttributeNumeric extends BaseSimple
+class Numeric extends BaseSimple
 {
     /**
      * {@inheritdoc}

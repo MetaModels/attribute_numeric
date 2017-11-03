@@ -22,7 +22,7 @@
  * @filesource
  */
 
-namespace MetaModels\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Attribute;
 
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\AbstractSimpleAttributeTypeFactory;
@@ -36,7 +36,7 @@ class AttributeTypeFactory extends AbstractSimpleAttributeTypeFactory
     /**
      * Create a new instance.
      *
-     * @param Connection       $connection       Database connection;
+     * @param Connection       $connection       Database connection.
      * @param TableManipulator $tableManipulator Table manipulator.
      */
     public function __construct(Connection $connection, TableManipulator $tableManipulator)
@@ -45,6 +45,6 @@ class AttributeTypeFactory extends AbstractSimpleAttributeTypeFactory
 
         $this->typeName  = 'numeric';
         $this->typeIcon  = 'bundles/metamodelsattributenumeric/numeric.png';
-        $this->typeClass = AttributeNumeric::class;
+        $this->typeClass = Numeric::class;
     }
 }

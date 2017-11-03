@@ -20,12 +20,12 @@
  * @filesource
  */
 
-namespace MetaModels\Test\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Test\Attribute;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
-use MetaModels\Attribute\Numeric\AttributeNumeric;
+use MetaModels\AttributeNumericBundle\Attribute\Numeric;
 use MetaModels\Helper\TableManipulator;
 use MetaModels\MetaModel;
 use PHPUnit\Framework\TestCase;
@@ -159,8 +159,8 @@ class AttributeNumericTest extends TestCase
     {
         $connection       = $this->mockDatabase();
         $tableManipulator = $this->mockTableManipulator($connection);
-        $text             = new AttributeNumeric($this->mockMetaModel('en', 'en'), [], $connection, $tableManipulator);
-        $this->assertInstanceOf(AttributeNumeric::class, $text);
+        $text             = new Numeric($this->mockMetaModel('en', 'en'), [], $connection, $tableManipulator);
+        $this->assertInstanceOf(Numeric::class, $text);
     }
 
     /**
@@ -205,7 +205,7 @@ class AttributeNumericTest extends TestCase
 
         $manipulator = $this->mockTableManipulator($connection);
 
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
             ['colname' => 'test'],
             $connection,
@@ -246,7 +246,7 @@ class AttributeNumericTest extends TestCase
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
             array('colname' => 'test'),
             $connection,
@@ -264,7 +264,7 @@ class AttributeNumericTest extends TestCase
     public function testSearchForWithNonNumeric()
     {
         $connection = $this->mockDatabase();
-        $decimal = new AttributeNumeric(
+        $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
             array('colname' => 'test'),
             $connection,

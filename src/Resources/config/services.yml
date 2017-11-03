@@ -1,6 +1,6 @@
 services:
     metamodels.attribute_numeric.factory:
-        class: MetaModels\Attribute\Numeric\AttributeTypeFactory
+        class: MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory
         arguments:
             - '@database_connection'
             - '@metamodels.table_manipulator'

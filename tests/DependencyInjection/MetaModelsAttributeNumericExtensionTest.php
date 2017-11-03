@@ -18,10 +18,10 @@
  * @filesource
  */
 
-namespace MetaModels\Test\Attribute\Numeric\DependencyInjection;
+namespace MetaModels\AttributeNumericBundle\Test\DependencyInjection;
 
-use MetaModels\Attribute\Numeric\AttributeTypeFactory;
-use MetaModels\Attribute\Numeric\DependencyInjection\MetaModelsAttributeNumericExtension;
+use MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory;
+use MetaModels\AttributeNumericBundle\DependencyInjection\MetaModelsAttributeNumericExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

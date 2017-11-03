@@ -20,12 +20,12 @@
  * @filesource
  */
 
-namespace MetaModels\Test\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Test\Attribute;
 
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\IAttributeTypeFactory;
-use MetaModels\Attribute\Numeric\AttributeNumeric;
-use MetaModels\Attribute\Numeric\AttributeTypeFactory;
+use MetaModels\AttributeNumericBundle\Attribute\Numeric;
+use MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory;
 use MetaModels\Helper\TableManipulator;
 use MetaModels\IMetaModel;
 use PHPUnit\Framework\TestCase;
@@ -140,7 +140,7 @@ class NumericAttributeTypeFactoryTest extends TestCase
             $this->mockMetaModel('mm_test', 'de', 'en')
         );
 
-        $this->assertInstanceOf(AttributeNumeric::class, $attribute);
+        $this->assertInstanceOf(Numeric::class, $attribute);
 
         foreach ($values as $key => $value) {
             $this->assertEquals($value, $attribute->get($key), $key);

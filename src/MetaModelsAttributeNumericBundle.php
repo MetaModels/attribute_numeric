@@ -18,7 +18,7 @@
  * @filesource
  */
 
-namespace MetaModels\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

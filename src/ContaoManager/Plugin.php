@@ -18,12 +18,12 @@
  * @filesource
  */
 
-namespace MetaModels\Attribute\Numeric\ContaoManager;
+namespace MetaModels\AttributeNumericBundle\ContaoManager;
 
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use MetaModels\Attribute\Numeric\MetaModelsAttributeNumericBundle;
+use MetaModels\AttributeNumericBundle\MetaModelsAttributeNumericBundle;
 use MetaModels\CoreBundle\MetaModelsCoreBundle;
 
 /**

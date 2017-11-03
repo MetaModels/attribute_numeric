@@ -45,16 +45,19 @@
   },
   "autoload": {
     "psr-4": {
-      "MetaModels\\Attribute\\Numeric\\": "src"
-    }
+      "MetaModels\\AttributeNumericBundle\\": "src"
+    },
+    "files": [
+      "src/deprecated-autoload.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
-      "MetaModels\\Test\\Attribute\\Numeric\\": "tests"
+      "MetaModels\\AttributeNumericBundle\\Test\\": "tests"
     }
   },
   "extra": {
-    "contao-manager-plugin": "MetaModels\\Attribute\\Numeric\\ContaoManager\\Plugin",
+    "contao-manager-plugin": "MetaModels\\AttributeNumericBundle\\ContaoManager\\Plugin",
     "contao": {
       "transifex": {
         "project": "metamodels",
