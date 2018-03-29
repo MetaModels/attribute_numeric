@@ -90,7 +90,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
                     ->getMockForAbstractClass();
 
                 $resultSet->method('fetch_row')->willReturnCallback(function () use (&$index, $resultData) {
-                    return array_values($resultData[$index++]);
+                    return \array_values($resultData[$index++]);
                 });
                 $resultSet->method('fetch_assoc')->willReturnCallback(function () use (&$index, $resultData) {
                     if (!isset($resultData[$index])) {
@@ -99,13 +99,13 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
                     return $resultData[$index++];
                 });
                 $resultSet->method('num_rows')->willReturnCallback(function () use ($index, $resultData) {
-                    return count($resultData);
+                    return \count($resultData);
                 });
                 $resultSet->method('num_fields')->willReturnCallback(function () use ($index, $resultData) {
-                    return count($resultData[$index]);
+                    return \count($resultData[$index]);
                 });
                 $resultSet->method('fetch_field')->willReturnCallback(function ($field) use ($index, $resultData) {
-                    $data = array_values($resultData[$index]);
+                    $data = \array_values($resultData[$index]);
                     return $data[$field];
                 });
                 $resultSet->method('data_seek')->willReturnCallback(function ($newIndex) use (&$index, $resultData) {
