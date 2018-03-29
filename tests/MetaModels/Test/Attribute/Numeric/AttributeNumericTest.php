@@ -25,6 +25,9 @@ namespace MetaModels\Test\Attribute\Numeric;
 use Contao\Database;
 use MetaModels\Attribute\Numeric\AttributeNumeric;
 use MetaModels\MetaModelsServiceContainer;
+use Contao\Database\Statement;
+use Contao\Database\Result;
+use MetaModels\MetaModel;
 
 /**
  * Unit tests to test class Numeric.
@@ -43,14 +46,14 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
     private function mockDatabase($expectedQuery = '', $result = null)
     {
         $mockDb = $this
-            ->getMockBuilder('Contao\Database')
+            ->getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->setMethods(['__destruct'])
             ->getMockForAbstractClass();
 
         $mockDb->method('createStatement')->willReturn(
             $statement = $this
-                ->getMockBuilder('Contao\Database\Statement')
+                ->getMockBuilder(Statement::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['debugQuery', 'createResult'])
                 ->getMockForAbstractClass()
@@ -82,7 +85,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
                 $resultData = (array) $resultData;
 
                 $resultSet = $this
-                    ->getMockBuilder('Contao\Database\Result')
+                    ->getMockBuilder(Result::class)
                     ->disableOriginalConstructor()
                     ->getMockForAbstractClass();
 
@@ -129,11 +132,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockMetaModel($language, $fallbackLanguage, $database)
     {
-        $metaModel = $this->getMock(
-            'MetaModels\MetaModel',
-            [],
-            [[]]
-        );
+        $metaModel = $this->getMock(MetaModel::class, [], [[]]);
 
         $metaModel
             ->expects($this->any())
@@ -168,7 +167,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
     public function testInstantiation()
     {
         $text = new AttributeNumeric($this->mockMetaModel('en', 'en', $this->mockDatabase()));
-        $this->assertInstanceOf('MetaModels\Attribute\Numeric\AttributeNumeric', $text);
+        $this->assertInstanceOf(AttributeNumeric::class, $text);
     }
 
 

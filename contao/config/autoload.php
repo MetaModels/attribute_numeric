@@ -25,7 +25,7 @@
 /**
  * Register the templates
  */
-TemplateLoader::addFiles(
+\Contao\TemplateLoader::addFiles(
     [
         'mm_attr_numeric' => 'system/modules/metamodelsattribute_numeric/templates',
     ]
