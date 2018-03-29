@@ -143,7 +143,7 @@ class AttributeNumeric extends BaseSimple
             $this->getMetaModel()->getTableName(),
             $this->getColName(),
             $strOperation,
-            intval($varValue)
+            (int) $varValue
         );
 
         $objIds = $this->getMetaModel()->getServiceContainer()->getDatabase()->execute($strSql);
