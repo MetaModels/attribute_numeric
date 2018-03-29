@@ -28,11 +28,12 @@ use MetaModels\MetaModelsServiceContainer;
 use Contao\Database\Statement;
 use Contao\Database\Result;
 use MetaModels\MetaModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class Numeric.
  */
-class AttributeNumericTest extends \PHPUnit_Framework_TestCase
+class AttributeNumericTest extends TestCase
 {
     /**
      * Mock the Contao database.
@@ -132,7 +133,7 @@ class AttributeNumericTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockMetaModel($language, $fallbackLanguage, $database)
     {
-        $metaModel = $this->getMock(MetaModel::class, [], [[]]);
+        $metaModel = $this->getMockBuilder(MetaModel::class)->setMethods([])->setConstructorArgs([[]])->getMock();
 
         $metaModel
             ->expects($this->any())
