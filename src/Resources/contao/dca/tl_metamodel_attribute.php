@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2015 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,8 @@
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2016 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2018 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
  */
@@ -24,4 +25,4 @@
 /**
  * Table tl_metamodel_attribute
  */
-$GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['numeric extends _simpleattribute_'] = array();
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['numeric extends _simpleattribute_'] = [];

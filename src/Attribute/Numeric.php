@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,8 @@
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2017 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2018 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
  */
@@ -44,21 +45,21 @@ class Numeric extends BaseSimple
      */
     public function getAttributeSettingNames()
     {
-        return array_merge(
+        return \array_merge(
             parent::getAttributeSettingNames(),
-            array(
+            [
                 'isunique',
                 'mandatory',
                 'filterable',
                 'searchable',
-            )
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinition($arrOverrides = array())
+    public function getFieldDefinition($arrOverrides = [])
     {
         $arrFieldDef                 = parent::getFieldDefinition($arrOverrides);
         $arrFieldDef['inputType']    = 'text';
@@ -104,21 +105,23 @@ class Numeric extends BaseSimple
     public function searchFor($strPattern)
     {
         // If search with wildcard => parent implementation with "LIKE" search.
-        if (false !== strpos($strPattern, '*') || false !== strpos($strPattern, '?')) {
+        if (false !== \strpos($strPattern, '*') || false !== \strpos($strPattern, '?')) {
             return parent::searchFor($strPattern);
         }
 
         // Not with wildcard but also not numeric, impossible to get decimal results.
         if (!is_numeric($strPattern)) {
-            return array();
+            return [];
         }
 
         // Do a simple search on given column.
-        $statement = $this->connection->prepare(
-            sprintf(
-                'SELECT id FROM %s WHERE %s=:pattern',
-                $this->getMetaModel()->getTableName(),
-                $this->getColName()
+        $statement = $this->connection
+            ->prepare(
+                \sprintf(
+                    'SELECT id FROM %s WHERE %s=:pattern',
+                    $this->getMetaModel()->getTableName(),
+                    $this->getColName()
+
             )
         );
 
@@ -139,12 +142,12 @@ class Numeric extends BaseSimple
      */
     private function getIdsFiltered($varValue, $strOperation)
     {
-        $strSql = sprintf(
+        $strSql = \sprintf(
             'SELECT id FROM %s WHERE %s %s %d',
             $this->getMetaModel()->getTableName(),
             $this->getColName(),
             $strOperation,
-            intval($varValue)
+            (int) $varValue
         );
 
         $statement = $this->connection->query($strSql);

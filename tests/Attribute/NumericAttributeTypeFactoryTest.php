@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,8 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2017 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2018 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
  */
@@ -29,6 +30,8 @@ use MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory;
 use MetaModels\Helper\TableManipulator;
 use MetaModels\IMetaModel;
 use PHPUnit\Framework\TestCase;
+use MetaModels\MetaModel;
+use MetaModels\Attribute\Numeric\AttributeNumeric;
 
 /**
  * Test the attribute factory.
@@ -63,7 +66,7 @@ class NumericAttributeTypeFactoryTest extends TestCase
     protected function mockMetaModel($tableName, $language, $fallbackLanguage)
     {
         $metaModel = $this
-            ->getMockBuilder('MetaModels\MetaModel')
+            ->getMockBuilder(MetaModel::class)
             ->setConstructorArgs([[]])
             ->getMock();
 
@@ -121,7 +124,7 @@ class NumericAttributeTypeFactoryTest extends TestCase
         $connection  = $this->mockConnection();
         $manipulator = $this->mockTableManipulator($connection);
 
-        return array(new AttributeTypeFactory($connection, $manipulator));
+        return [new AttributeTypeFactory($connection, $manipulator)];
     }
 
     /**
