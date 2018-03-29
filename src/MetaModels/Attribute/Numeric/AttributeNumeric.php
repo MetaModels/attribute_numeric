@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,8 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
- * @copyright  2012-2017 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2018 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
  * @filesource
  */
@@ -45,19 +46,19 @@ class AttributeNumeric extends BaseSimple
     {
         return array_merge(
             parent::getAttributeSettingNames(),
-            array(
+            [
                 'isunique',
                 'mandatory',
                 'filterable',
                 'searchable',
-            )
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinition($arrOverrides = array())
+    public function getFieldDefinition($arrOverrides = [])
     {
         $arrFieldDef                 = parent::getFieldDefinition($arrOverrides);
         $arrFieldDef['inputType']    = 'text';
@@ -109,7 +110,7 @@ class AttributeNumeric extends BaseSimple
 
         // Not with wildcard but also not numeric, impossible to get decimal results.
         if (!is_numeric($strPattern)) {
-            return array();
+            return [];
         }
 
         // Do a simple search on given column.
