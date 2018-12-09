@@ -13,7 +13,6 @@
  * @package    MetaModels
  * @subpackage AttributeNumeric
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Sven Baumann <baumann.sv@gmail.com>
