@@ -3,20 +3,20 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2015 The MetaModels team.
+ * (c) 2012-2019 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels
- * @subpackage Tests
+ * @package    MetaModels/attribute_numeric
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2016 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2019 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -170,10 +170,10 @@ class AttributeNumericTest extends TestCase
      */
     public function searchForProvider()
     {
-        return array(
-            array('10'),
-            array(10),
-        );
+        return [
+            ['10'],
+            [10],
+        ];
     }
 
     /**
@@ -248,12 +248,12 @@ class AttributeNumericTest extends TestCase
 
         $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
-            array('colname' => 'test'),
+            ['colname' => 'test'],
             $connection,
             $this->mockTableManipulator($connection)
         );
 
-        $this->assertEquals(array(1, 2), $decimal->searchFor('10*'));
+        $this->assertEquals([1, 2], $decimal->searchFor('10*'));
     }
 
     /**
@@ -266,11 +266,11 @@ class AttributeNumericTest extends TestCase
         $connection = $this->mockDatabase();
         $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
-            array('colname' => 'test'),
+            ['colname' => 'test'],
             $connection,
             $this->mockTableManipulator($connection)
         );
 
-        $this->assertEquals(array(), $decimal->searchFor('abc'));
+        $this->assertEquals([], $decimal->searchFor('abc'));
     }
 }
