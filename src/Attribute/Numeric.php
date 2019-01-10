@@ -120,9 +120,8 @@ class Numeric extends BaseSimple
                     'SELECT id FROM %s WHERE %s=:pattern',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
-
-            )
-        );
+                )
+            );
 
         $statement->bindValue('pattern', $strPattern);
         $statement->execute();
