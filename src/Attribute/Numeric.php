@@ -15,20 +15,21 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     David Greminger <david.greminger@1up.io>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2012-2019 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-namespace MetaModels\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Attribute;
 
 use MetaModels\Attribute\BaseSimple;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
-class AttributeNumeric extends BaseSimple
+class Numeric extends BaseSimple
 {
     /**
      * {@inheritdoc}
@@ -113,17 +114,19 @@ class AttributeNumeric extends BaseSimple
         }
 
         // Do a simple search on given column.
-        $query = $this->getMetaModel()->getServiceContainer()->getDatabase()
+        $statement = $this->connection
             ->prepare(
                 \sprintf(
-                    'SELECT id FROM %s WHERE %s=?',
+                    'SELECT id FROM %s WHERE %s=:pattern',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
                 )
-            )
-            ->execute($strPattern);
+            );
 
-        return $query->fetchEach('id');
+        $statement->bindValue('pattern', $strPattern);
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
     }
 
     /**
@@ -145,8 +148,8 @@ class AttributeNumeric extends BaseSimple
             (int) $varValue
         );
 
-        $objIds = $this->getMetaModel()->getServiceContainer()->getDatabase()->execute($strSql);
+        $statement = $this->connection->query($strSql);
 
-        return $objIds->fetchEach('id');
+        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
     }
 }

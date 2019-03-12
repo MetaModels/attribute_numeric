@@ -12,26 +12,44 @@
  *
  * @package    MetaModels/attribute_numeric
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2012-2019 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-namespace MetaModels\Test\Attribute\Numeric;
+namespace MetaModels\AttributeNumericBundle\Test\Attribute;
 
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\IAttributeTypeFactory;
-use MetaModels\Attribute\Numeric\AttributeTypeFactory;
+use MetaModels\AttributeNumericBundle\Attribute\Numeric;
+use MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory;
+use MetaModels\Helper\TableManipulator;
 use MetaModels\IMetaModel;
-use MetaModels\Test\Attribute\AttributeTypeFactoryTest;
+use PHPUnit\Framework\TestCase;
 use MetaModels\MetaModel;
 use MetaModels\Attribute\Numeric\AttributeNumeric;
 
 /**
  * Test the attribute factory.
  */
-class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
+class NumericAttributeTypeFactoryTest extends TestCase
 {
+    /**
+     * System columns.
+     *
+     * @var array
+     */
+    private $systemColumns = [
+        'id',
+        'pid',
+        'sorting',
+        'tstamp',
+        'vargroup',
+        'varbase ',
+    ];
+
     /**
      * Mock a MetaModel.
      *
@@ -45,7 +63,10 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
      */
     protected function mockMetaModel($tableName, $language, $fallbackLanguage)
     {
-        $metaModel = $this->getMockBuilder(MetaModel::class)->setMethods([])->setConstructorArgs([[]])->getMock();
+        $metaModel = $this
+            ->getMockBuilder(MetaModel::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
 
         $metaModel
             ->expects($this->any())
@@ -66,13 +87,42 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
     }
 
     /**
+     * Mock the database connection.
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private function mockConnection()
+    {
+        return $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * Mock the table manipulator.
+     *
+     * @param Connection $connection The database connection mock.
+     *
+     * @return TableManipulator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function mockTableManipulator(Connection $connection)
+    {
+        return $this->getMockBuilder(TableManipulator::class)
+            ->setConstructorArgs([$connection, $this->systemColumns])
+            ->getMock();
+    }
+
+    /**
      * Override the method to run the tests on the attribute factories to be tested.
      *
      * @return IAttributeTypeFactory[]
      */
     protected function getAttributeFactories()
     {
-        return [new AttributeTypeFactory()];
+        $connection  = $this->mockConnection();
+        $manipulator = $this->mockTableManipulator($connection);
+
+        return [new AttributeTypeFactory($connection, $manipulator)];
     }
 
     /**
@@ -80,16 +130,18 @@ class NumericAttributeTypeFactoryTest extends AttributeTypeFactoryTest
      *
      * @return void
      */
-    public function testCreateSelect()
+    public function testCreateNumeric()
     {
-        $factory   = new AttributeTypeFactory();
-        $values    = [];
-        $attribute = $factory->createInstance(
+        $connection  = $this->mockConnection();
+        $manipulator = $this->mockTableManipulator($connection);
+        $factory     = new AttributeTypeFactory($connection, $manipulator);
+        $values      = [];
+        $attribute   = $factory->createInstance(
             $values,
             $this->mockMetaModel('mm_test', 'de', 'en')
         );
 
-        $this->assertInstanceOf(AttributeNumeric::class, $attribute);
+        $this->assertInstanceOf(Numeric::class, $attribute);
 
         foreach ($values as $key => $value) {
             $this->assertEquals($value, $attribute->get($key), $key);
