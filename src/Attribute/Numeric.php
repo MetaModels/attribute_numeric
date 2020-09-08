@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2020 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2020 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -117,7 +118,7 @@ class Numeric extends BaseSimple
         $statement = $this->connection
             ->prepare(
                 \sprintf(
-                    'SELECT id FROM %s WHERE %s=:pattern',
+                    'SELECT t.id FROM %s AS t WHERE t.%s=:pattern',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
                 )
@@ -151,7 +152,7 @@ class Numeric extends BaseSimple
     private function getIdsFiltered($varValue, $strOperation)
     {
         $strSql = \sprintf(
-            'SELECT id FROM %s WHERE %s %s %d',
+            'SELECT t.id FROM %s AS t WHERE t.%s %s %d',
             $this->getMetaModel()->getTableName(),
             $this->getColName(),
             $strOperation,
