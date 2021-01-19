@@ -120,7 +120,7 @@ class Numeric extends BaseSimple
         $statement = $this->connection
             ->prepare(
                 \sprintf(
-                    'SELECT id FROM %s WHERE %s=:pattern',
+                    'SELECT t.id FROM %s AS t WHERE t.%s=:pattern',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
                 )
@@ -154,7 +154,7 @@ class Numeric extends BaseSimple
     private function getIdsFiltered($varValue, $strOperation)
     {
         $strSql = \sprintf(
-            'SELECT id FROM %s WHERE %s %s %d',
+            'SELECT t.id FROM %s AS t WHERE t.%s %s %d',
             $this->getMetaModel()->getTableName(),
             $this->getColName(),
             $strOperation,
