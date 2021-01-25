@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2020 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2020 The MetaModels team.
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -37,6 +37,7 @@ class Numeric extends BaseSimple
      */
     public function getSQLDataType()
     {
+        // Note the maxlength in getFieldDefinition.
         return 'int(10) NULL default NULL';
     }
 
@@ -61,9 +62,10 @@ class Numeric extends BaseSimple
      */
     public function getFieldDefinition($arrOverrides = [])
     {
-        $arrFieldDef                 = parent::getFieldDefinition($arrOverrides);
-        $arrFieldDef['inputType']    = 'text';
-        $arrFieldDef['eval']['rgxp'] = 'digit';
+        $arrFieldDef                      = parent::getFieldDefinition($arrOverrides);
+        $arrFieldDef['inputType']         = 'text';
+        $arrFieldDef['eval']['rgxp']      = 'digit';
+        $arrFieldDef['eval']['maxlength'] = '10';
 
         return $arrFieldDef;
     }
