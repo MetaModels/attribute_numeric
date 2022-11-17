@@ -203,7 +203,7 @@ class AttributeNumericTest extends TestCase
                     ->with(\PDO::FETCH_COLUMN, 'id')
                     ->willReturn([1, 2]);
             },
-            'SELECT id FROM mm_unittest WHERE test=:pattern'
+            'SELECT t.id FROM mm_unittest AS t WHERE t.test=:pattern'
         );
 
         $manipulator = $this->mockTableManipulator($connection);
