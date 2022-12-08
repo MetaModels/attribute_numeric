@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -117,19 +117,14 @@ class Numeric extends BaseSimple
         }
 
         // Do a simple search on given column.
-        $statement = $this->connection
-            ->prepare(
-                \sprintf(
-                    'SELECT t.id FROM %s AS t WHERE t.%s=:pattern',
-                    $this->getMetaModel()->getTableName(),
-                    $this->getColName()
-                )
-            );
+        $statement = $this->connection->createQueryBuilder()
+            ->select('t.id')
+            ->from($this->getMetaModel()->getTableName(), 't')
+            ->where('t.' . $this->getColName(), ':pattern')
+            ->setParameter('pattern', $strPattern)
+            ->executeQuery();
 
-        $statement->bindValue('pattern', $strPattern);
-        $statement->execute();
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
+        return $statement->fetchFirstColumn();
     }
 
     /**
@@ -146,23 +141,19 @@ class Numeric extends BaseSimple
      * Filter all values by specified operation.
      *
      * @param int    $varValue     The value to use as upper end.
-     *
      * @param string $strOperation The specified operation like greater than, lower than etc.
      *
      * @return string[] The list of item ids of all items matching the condition.
      */
     private function getIdsFiltered($varValue, $strOperation)
     {
-        $strSql = \sprintf(
-            'SELECT t.id FROM %s AS t WHERE t.%s %s %d',
-            $this->getMetaModel()->getTableName(),
-            $this->getColName(),
-            $strOperation,
-            (int) $varValue
-        );
+        $statement = $this->connection->createQueryBuilder()
+            ->select('t.id')
+            ->from($this->getMetaModel()->getTableName(), 't')
+            ->where('t.' . $this->getColName() . $strOperation . ':value')
+            ->setParameter('value', (int) $varValue)
+            ->executeQuery();
 
-        $statement = $this->connection->query($strSql);
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
+        return $statement->fetchFirstColumn();
     }
 }
