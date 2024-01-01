@@ -24,11 +24,11 @@
 namespace MetaModels\AttributeNumericBundle\Test\Attribute;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use MetaModels\AttributeNumericBundle\Attribute\Numeric;
 use MetaModels\Helper\TableManipulator;
-use MetaModels\MetaModel;
+use MetaModels\IMetaModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -53,88 +53,31 @@ class AttributeNumericTest extends TestCase
     ];
 
     /**
-     * Mock the Contao database.
-     *
-     * @param string|null   expectedQuery The query to expect.
-     *
-     * @param callable|null $callback     Callback which gets mocked statement passed.
-     *
-     * @return Connection|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function mockDatabase(callable $callback = null, $expectedQuery = null, $queryMethod = 'prepare')
-    {
-        $mockDb = $this
-            ->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $statement = $this
-            ->getMockBuilder(Statement::class)
-            ->getMock();
-
-        $mockDb->method('prepare')->willReturn($statement);
-        $mockDb->method('query')->willReturn($statement);
-
-        if ($callback) {
-            call_user_func($callback, $statement);
-        }
-
-        if (!$expectedQuery || $expectedQuery === 'prepare') {
-            $mockDb->expects($this->never())->method('query');
-        }
-
-        if (!$expectedQuery || $expectedQuery === 'query') {
-            $mockDb->expects($this->never())->method('prepare');
-        }
-
-        if (!$expectedQuery) {
-            return $mockDb;
-        }
-
-        $mockDb
-            ->expects($this->once())
-            ->method($queryMethod)
-            ->with($expectedQuery);
-
-        if ($queryMethod === 'prepare') {
-            $statement
-                ->expects($this->once())
-                ->method('execute')
-                ->willReturn(true);
-        }
-
-        return $mockDb;
-    }
-
-    /**
      * Mock a MetaModel.
      *
-     * @param string     $language         The language.
-     *
-     * @param string     $fallbackLanguage The fallback language.
+     * @param string $language         The language.
+     * @param string $fallbackLanguage The fallback language.
      *
      * @return \MetaModels\IMetaModel
      */
     protected function mockMetaModel($language, $fallbackLanguage)
     {
-        $metaModel = $this->getMockBuilder(MetaModel::class)
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getTableName')
-            ->will($this->returnValue('mm_unittest'));
+            ->willReturn('mm_unittest');
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getActiveLanguage')
-            ->will($this->returnValue($language));
+            ->willReturn($language);
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFallbackLanguage')
-            ->will($this->returnValue($fallbackLanguage));
+            ->willReturn($fallbackLanguage);
 
         return $metaModel;
     }
@@ -144,7 +87,7 @@ class AttributeNumericTest extends TestCase
      *
      * @param Connection $connection The database connection mock.
      *
-     * @return TableManipulator|\PHPUnit_Framework_MockObject_MockObject
+     * @return TableManipulator&MockObject
      */
     private function mockTableManipulator(Connection $connection)
     {
@@ -160,7 +103,7 @@ class AttributeNumericTest extends TestCase
      */
     public function testInstantiation()
     {
-        $connection       = $this->mockDatabase();
+        $connection       = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $tableManipulator = $this->mockTableManipulator($connection);
         $text             = new Numeric($this->mockMetaModel('en', 'en'), [], $connection, $tableManipulator);
         $this->assertInstanceOf(Numeric::class, $text);
@@ -188,23 +131,43 @@ class AttributeNumericTest extends TestCase
      *
      * @dataProvider searchForProvider
      */
-    public function testSearchFor($value)
+    public function testSearchFor($value): void
     {
-        $connection = $this->mockDatabase(
-            function ($statement) use ($value) {
-                $statement
-                    ->expects($this->once())
-                    ->method('bindValue')
-                    ->with('pattern', $value);
+        $connection    = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $selectBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('createQueryBuilder')->willReturn($selectBuilder);
 
-                $statement
-                    ->expects($this->once())
-                    ->method('fetchAll')
-                    ->with(\PDO::FETCH_COLUMN, 'id')
-                    ->willReturn([1, 2]);
-            },
-            'SELECT t.id FROM mm_unittest AS t WHERE t.test=:pattern'
-        );
+        $selectBuilder
+            ->expects($this->once())
+            ->method('select')
+            ->with('t.id')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('from')
+            ->with('mm_unittest', 't')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('where')
+            ->with('t.test=:pattern')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('setParameter')
+            ->with('pattern', $value)
+            ->willReturn($selectBuilder);
+
+        $selectResult = $this->getMockBuilder(Result::class)->disableOriginalConstructor()->getMock();
+        $selectBuilder
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($selectResult);
+
+        $selectResult
+            ->expects($this->once())
+            ->method('fetchFirstColumn')
+            ->willReturn([1, 2]);
 
         $manipulator = $this->mockTableManipulator($connection);
 
@@ -223,31 +186,43 @@ class AttributeNumericTest extends TestCase
      *
      * @return void
      */
-    public function testSearchForWithWildcard()
+    public function testSearchForWithWildcard(): void
     {
-        // TODO: Wait until BaseSimple attribute got rewritten to finish the test.
-        $connection = $this->mockDatabase();
+        $connection    = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $selectBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('createQueryBuilder')->willReturn($selectBuilder);
 
-        $statement = $this->getMockBuilder(Statement::class)->getMock();
-        $statement
+        $selectBuilder
             ->expects($this->once())
-            ->method('fetchAll')
-            ->with(\PDO::FETCH_COLUMN, 'id')
+            ->method('select')
+            ->with('t.id')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('from')
+            ->with('mm_unittest', 't')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('where')
+            ->with('t.test LIKE :pattern')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('setParameter')
+            ->with('pattern', '_10%')
+            ->willReturn($selectBuilder);
+
+        $selectResult = $this->getMockBuilder(Result::class)->disableOriginalConstructor()->getMock();
+        $selectBuilder
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($selectResult);
+
+        $selectResult
+            ->expects($this->once())
+            ->method('fetchFirstColumn')
             ->willReturn([1, 2]);
-
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        foreach (['select', 'from', 'where', 'groupBy', 'orderBy', 'setParameter'] as $method) {
-            $queryBuilder->method($method)->willReturn($queryBuilder);
-        }
-
-        $queryBuilder->method('execute')->willReturn($statement);
-
-        $connection
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
 
         $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
@@ -256,17 +231,22 @@ class AttributeNumericTest extends TestCase
             $this->mockTableManipulator($connection)
         );
 
-        $this->assertEquals([1, 2], $decimal->searchFor('10*'));
+        $this->assertEquals([1, 2], $decimal->searchFor('?10*'));
     }
 
     /**
-     * Test the searchFor() method with a non numeric value.
+     * Test the searchFor() method with a non-numeric value.
      *
      * @return void
      */
-    public function testSearchForWithNonNumeric()
+    public function testSearchForWithNonNumeric(): void
     {
-        $connection = $this->mockDatabase();
+        $connection = $this
+            ->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->never())->method('createQueryBuilder');
+
         $decimal = new Numeric(
             $this->mockMetaModel('en', 'en'),
             ['colname' => 'test'],
