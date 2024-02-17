@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,7 @@
  * @package    MetaModels/attribute_numeric
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -24,7 +24,6 @@ use MetaModels\AttributeNumericBundle\Attribute\AttributeTypeFactory;
 use MetaModels\AttributeNumericBundle\DependencyInjection\MetaModelsAttributeNumericExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
@@ -54,26 +53,13 @@ class MetaModelsAttributeNumericExtensionTest extends TestCase
      */
     public function testFactoryIsRegistered()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-
-        $container
-            ->expects($this->once())
-            ->method('setDefinition')
-            ->with(
-                'metamodels.attribute_numeric.factory',
-                $this->callback(
-                    function ($value) {
-                        /** @var Definition $value */
-                        $this->assertInstanceOf(Definition::class, $value);
-                        $this->assertEquals(AttributeTypeFactory::class, $value->getClass());
-                        $this->assertCount(1, $value->getTag('metamodels.attribute_factory'));
-
-                        return true;
-                    }
-                )
-            );
+        $container = new ContainerBuilder();
 
         $extension = new MetaModelsAttributeNumericExtension();
         $extension->load([], $container);
+
+        self::assertTrue($container->hasDefinition('metamodels.attribute_numeric.factory'));
+        $definition = $container->getDefinition('metamodels.attribute_numeric.factory');
+        self::assertCount(1, $definition->getTag('metamodels.attribute_factory'));
     }
 }
