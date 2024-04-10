@@ -27,6 +27,10 @@ namespace MetaModels\AttributeNumericBundle\Attribute;
 
 use MetaModels\Attribute\BaseSimple;
 
+use function array_map;
+use function array_merge;
+use function str_contains;
+
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
  */
@@ -46,7 +50,7 @@ class Numeric extends BaseSimple
      */
     public function getAttributeSettingNames()
     {
-        return \array_merge(
+        return array_merge(
             parent::getAttributeSettingNames(),
             [
                 'isunique',
@@ -107,7 +111,7 @@ class Numeric extends BaseSimple
     public function searchFor($strPattern)
     {
         // If search with wildcard => parent implementation with "LIKE" search.
-        if (\str_contains($strPattern, '*') || \str_contains($strPattern, '?')) {
+        if (str_contains($strPattern, '*') || str_contains($strPattern, '?')) {
             return parent::searchFor($strPattern);
         }
 
@@ -124,7 +128,8 @@ class Numeric extends BaseSimple
             ->setParameter('pattern', $strPattern)
             ->executeQuery();
 
-        return $statement->fetchFirstColumn();
+        // Return value list as list<mixed>, parent function wants a list<string> so we make a cast.
+        return array_map(static fn (mixed $value) => (string) $value, $statement->fetchFirstColumn());
     }
 
     /**
