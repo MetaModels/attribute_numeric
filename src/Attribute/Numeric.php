@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_numeric.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_numeric/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -26,6 +26,10 @@
 namespace MetaModels\AttributeNumericBundle\Attribute;
 
 use MetaModels\Attribute\BaseSimple;
+
+use function array_map;
+use function array_merge;
+use function str_contains;
 
 /**
  * This is the MetaModelAttribute class for handling numeric fields.
@@ -46,7 +50,7 @@ class Numeric extends BaseSimple
      */
     public function getAttributeSettingNames()
     {
-        return \array_merge(
+        return array_merge(
             parent::getAttributeSettingNames(),
             [
                 'isunique',
@@ -95,19 +99,12 @@ class Numeric extends BaseSimple
     }
 
     /**
-     * Search all items that match the given expression.
-     *
-     * Base implementation, perform string matching search.
-     * The standard wildcards * (many characters) and ? (a single character) are supported.
-     *
-     * @param string $strPattern The text to search for. This may contain wildcards.
-     *
-     * @return int[] the ids of matching items.
+     * {@inheritdoc}
      */
     public function searchFor($strPattern)
     {
         // If search with wildcard => parent implementation with "LIKE" search.
-        if (false !== \strpos($strPattern, '*') || false !== \strpos($strPattern, '?')) {
+        if (str_contains($strPattern, '*') || str_contains($strPattern, '?')) {
             return parent::searchFor($strPattern);
         }
 
@@ -117,19 +114,15 @@ class Numeric extends BaseSimple
         }
 
         // Do a simple search on given column.
-        $statement = $this->connection
-            ->prepare(
-                \sprintf(
-                    'SELECT t.id FROM %s AS t WHERE t.%s=:pattern',
-                    $this->getMetaModel()->getTableName(),
-                    $this->getColName()
-                )
-            );
+        $statement = $this->connection->createQueryBuilder()
+            ->select('t.id')
+            ->from($this->getMetaModel()->getTableName(), 't')
+            ->where('t.' . $this->getColName() . '=:pattern')
+            ->setParameter('pattern', $strPattern)
+            ->executeQuery();
 
-        $statement->bindValue('pattern', $strPattern);
-        $statement->execute();
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
+        // Return value list as list<mixed>, parent function wants a list<string> so we make a cast.
+        return array_map(static fn (mixed $value) => (string) $value, $statement->fetchFirstColumn());
     }
 
     /**
@@ -146,23 +139,19 @@ class Numeric extends BaseSimple
      * Filter all values by specified operation.
      *
      * @param int    $varValue     The value to use as upper end.
-     *
      * @param string $strOperation The specified operation like greater than, lower than etc.
      *
-     * @return string[] The list of item ids of all items matching the condition.
+     * @return list<string> The list of item ids of all items matching the condition.
      */
-    private function getIdsFiltered($varValue, $strOperation)
+    private function getIdsFiltered(int $varValue, string $strOperation): array
     {
-        $strSql = \sprintf(
-            'SELECT t.id FROM %s AS t WHERE t.%s %s %d',
-            $this->getMetaModel()->getTableName(),
-            $this->getColName(),
-            $strOperation,
-            (int) $varValue
-        );
+        $statement = $this->connection->createQueryBuilder()
+            ->select('t.id')
+            ->from($this->getMetaModel()->getTableName(), 't')
+            ->where('t.' . $this->getColName() . $strOperation . ':value')
+            ->setParameter('value', $varValue)
+            ->executeQuery();
 
-        $statement = $this->connection->query($strSql);
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'id');
+        return $statement->fetchFirstColumn();
     }
 }
